@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Notion API
+  version: 1.0.0
+  description: API documentation for Notion's `POST /v1/search` endpoint.
+
+servers:
+  - url: https://api.notion.com
+    description: Notion API Server
+
+paths:
+  /v1/search:
+    post:
+      summary: Search for pages, databases, and other objects within a Notion workspace.
+      operationId: search
+      tags:
+        - Search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successfully retrieved search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to perform the search.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: The text to search for.
+        filter:
+          type: object
+          properties:
+            value:
+              type: string
+              description: The type of object to filter by (e.g., `page`, `database`).
+            property:
+              type: string
+          required:
+            - value
+            - property
+        sort:
+          type: object
+          properties:
+            direction:
+              type: string
+              enum: [ascending, descending]
+            timestamp:
+              type: string
+              enum: [last_edited_time]
+        start_cursor:
+          type: string
+          description: Pagination cursor for the start of the search results.
+        page_size:
+          type: integer
+          description: Number of results to return per page.
+          minimum: 1
+          maximum: 100
+
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
