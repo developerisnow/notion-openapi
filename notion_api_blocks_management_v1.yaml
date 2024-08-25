@@ -1,0 +1,269 @@
+openapi: 3.1.0
+info:
+  title: Notion API
+  version: 1.0.0
+  description: API documentation for Notion's `PATCH /v1/blocks/{block_id}/children`, `GET /v1/blocks/{block_id}`, `GET /v1/blocks/{block_id}/children`, `PATCH /v1/blocks/{block_id}`, and `DELETE /v1/blocks/{block_id}` endpoints.
+
+servers:
+  - url: https://api.notion.com
+    description: Notion API Server
+
+paths:
+  /v1/blocks/{block_id}:
+    get:
+      summary: Retrieve a block object using its ID.
+      operationId: retrieveBlock
+      tags:
+        - Blocks
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          description: The ID of the block to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the block.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockResponse'
+        '400':
+          description: Bad request, invalid block ID.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to retrieve the block.
+        '404':
+          description: Block not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+    patch:
+      summary: Update a block's properties.
+      operationId: updateBlock
+      tags:
+        - Blocks
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          description: The ID of the block to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockRequest'
+      responses:
+        '200':
+          description: Successfully updated the block.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to update the block.
+        '404':
+          description: Block not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Delete a block using its ID.
+      operationId: deleteBlock
+      tags:
+        - Blocks
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          description: The ID of the block to delete.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted the block.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockResponse'
+        '400':
+          description: Bad request, invalid block ID.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to delete the block.
+        '404':
+          description: Block not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+  /v1/blocks/{block_id}/children:
+    get:
+      summary: Retrieve the children of a block.
+      operationId: retrieveBlockChildren
+      tags:
+        - Blocks
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          description: The ID of the block whose children are to be retrieved.
+          schema:
+            type: string
+        - name: start_cursor
+          in: query
+          required: false
+          description: Pagination cursor for fetching the next set of results.
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          required: false
+          description: The number of results to retrieve per page (default is 100).
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved the block's children.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockChildrenResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to retrieve the block's children.
+        '404':
+          description: Block not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+    patch:
+      summary: Update the children of a block.
+      operationId: updateBlockChildren
+      tags:
+        - Blocks
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          description: The ID of the block to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockChildrenRequest'
+      responses:
+        '200':
+          description: Successfully updated the block's children.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockChildrenResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to update the block's children.
+        '404':
+          description: Block not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UpdateBlockRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of block (e.g., paragraph, image).
+        properties:
+          type: object
+          description: The properties to update for the block.
+      required:
+        - type
+
+    UpdateBlockChildrenRequest:
+      type: object
+      properties:
+        children:
+          type: array
+          description: The list of block children to update.
+          items:
+            type: object
+      required:
+        - children
+
+    BlockResponse:
+      type: object
+      properties:
+        object:
+          type: string
+        id:
+          type: string
+          description: The unique identifier for the block.
+        type:
+          type: string
+          description: The type of the block (e.g., paragraph, image).
+        created_time:
+          type: string
+          format: date-time
+        last_edited_time:
+          type: string
+          format: date-time
+        has_children:
+          type: boolean
+          description: Indicates if the block has children.
+        archived:
+          type: boolean
+          description: Indicates if the block is archived.
+        properties:
+          type: object
+          description: The block's properties based on its type.
+
+    BlockChildrenResponse:
+      type: object
+      properties:
+        object:
+          type: string
+        results:
+          type: array
+          items:
+            type: object
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
