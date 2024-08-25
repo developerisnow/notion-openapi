@@ -1,0 +1,292 @@
+openapi: 3.1.0
+info:
+  title: Notion API
+  version: 1.0.0
+  description: API documentation for Notion's `POST /v1/databases`, `POST /v1/databases/{database_id}/query`, `GET /v1/databases/{database_id}`, and `PATCH /v1/databases/{database_id}` endpoints.
+
+servers:
+  - url: https://api.notion.com
+    description: Notion API Server
+
+paths:
+  /v1/databases:
+    post:
+      summary: Create a new database in a Notion workspace.
+      operationId: createDatabase
+      tags:
+        - Databases
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDatabaseRequest'
+      responses:
+        '200':
+          description: Successfully created a new database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to create a database.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+  /v1/databases/{database_id}:
+    get:
+      summary: Retrieve a database by its ID.
+      operationId: retrieveDatabase
+      tags:
+        - Databases
+      parameters:
+        - name: database_id
+          in: path
+          required: true
+          description: The ID of the database to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseResponse'
+        '400':
+          description: Bad request, invalid database ID.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to retrieve the database.
+        '404':
+          description: Database not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+    patch:
+      summary: Update properties of an existing database.
+      operationId: updateDatabase
+      tags:
+        - Databases
+      parameters:
+        - name: database_id
+          in: path
+          required: true
+          description: The ID of the database to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDatabaseRequest'
+      responses:
+        '200':
+          description: Successfully updated the database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to update the database.
+        '404':
+          description: Database not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+  /v1/databases/{database_id}/query:
+    post:
+      summary: Query items in a specific database.
+      operationId: queryDatabase
+      tags:
+        - Databases
+      parameters:
+        - name: database_id
+          in: path
+          required: true
+          description: The ID of the database to query.
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatabaseQueryRequest'
+      responses:
+        '200':
+          description: Successfully retrieved the query results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseQueryResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to query the database.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateDatabaseRequest:
+      type: object
+      properties:
+        parent:
+          type: object
+          properties:
+            page_id:
+              type: string
+              description: The ID of the parent page where the database will be created.
+          required:
+            - page_id
+        title:
+          type: array
+          description: The title of the database.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              text:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  link:
+                    type: object
+                    nullable: true
+                    properties:
+                      url:
+                        type: string
+        properties:
+          type: object
+          description: The properties of the database, defining the structure of the data.
+          additionalProperties:
+            type: object
+      required:
+        - parent
+        - title
+        - properties
+
+    UpdateDatabaseRequest:
+      type: object
+      properties:
+        title:
+          type: array
+          description: The new title of the database.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              text:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  link:
+                    type: object
+                    nullable: true
+                    properties:
+                      url:
+                        type: string
+        properties:
+          type: object
+          description: The updated properties of the database.
+          additionalProperties:
+            type: object
+
+    DatabaseQueryRequest:
+      type: object
+      properties:
+        filter:
+          type: object
+          description: Conditions to filter the database items.
+        sorts:
+          type: array
+          description: Sorts applied to the database query.
+          items:
+            type: object
+            properties:
+              property:
+                type: string
+                description: The name of the property to sort by.
+              direction:
+                type: string
+                enum: [ascending, descending]
+                description: The direction to sort by.
+        start_cursor:
+          type: string
+          description: Pagination cursor for the start of the query.
+        page_size:
+          type: integer
+          description: The number of items to return per page.
+          minimum: 1
+          maximum: 100
+
+    DatabaseQueryResponse:
+      type: object
+      properties:
+        object:
+          type: string
+        results:
+          type: array
+          items:
+            type: object
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
+
+    DatabaseResponse:
+      type: object
+      properties:
+        object:
+          type: string
+        id:
+          type: string
+          description: The unique identifier for the database.
+        created_time:
+          type: string
+          format: date-time
+        last_edited_time:
+          type: string
+          format: date-time
+        title:
+          type: array
+          items:
+            type: object
+        properties:
+          type: object
+          description: The properties of the database.
+        url:
+          type: string
+          description: URL to the created database.
