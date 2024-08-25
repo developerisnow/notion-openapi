@@ -1,17 +1,17 @@
 # Notion API OpenAPI 3.1 Document
 
-This repository contains OpenAPI 3.1 YAML documents for various aspects of the Notion API. These files provide structured documentation for managing different components within the Notion platform.
+このリポジトリには、Notion APIのさまざまな側面に関するOpenAPI 3.1 YAMLドキュメントが含まれています。これらのファイルは、Notionプラットフォーム内の異なるコンポーネントを管理するための構造化されたドキュメントを提供します。
 
-## Files Included
+## 含まれているファイル
 
-- **notion_api_blocks_management_v1.yaml**: Documentation for managing Notion blocks.
-- **notion_api_database_management_v1.yaml**: Documentation for managing Notion databases.
-- **notion_api_pages_search_documentation_v1.yaml**: Documentation for managing pages and search functionality.
+- [**notion_api_blocks_management_v1.yaml**](notion_api_blocks_management_v1.yaml): Notionブロックを管理するためのドキュメント。
+- [**notion_api_database_management_v1.yaml**](notion_api_database_management_v1.yaml): Notionデータベースを管理するためのドキュメント。
+- [**notion_api_pages_search_documentation_v1.yaml**](notion_api_pages_search_documentation_v1.yaml): ページと検索機能を管理するためのドキュメント。
 
-## Usage
+## 使い方
 
-You can use these YAML files with API tools that support OpenAPI 3.1 specifications for testing, validation, or integration with Notion's API.
+これらのYAMLファイルは、OpenAPI 3.1仕様をサポートするAPIツールと共に使用して、NotionのAPIをテスト、検証、または統合することができます。
 
-## License
+## ライセンス
 
-This project is licensed under the MIT License.
+このプロジェクトはMITライセンスの下でライセンスされています。
