@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Notion API
   version: 1.0.0
-  description: API documentation for Notion's `POST /v1/pages` endpoint.
+  description: API documentation for Notion's `POST /v1/pages` and `GET /v1/pages/{page_id}` endpoints.
 
 servers:
   - url: https://api.notion.com
@@ -34,6 +34,39 @@ paths:
           description: Unauthorized, missing or invalid authentication token.
         '403':
           description: Forbidden, insufficient permissions to create a page.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+  /v1/pages/{page_id}:
+    get:
+      summary: Retrieve a page object using the page ID.
+      operationId: retrievePage
+      tags:
+        - Pages
+      parameters:
+        - name: page_id
+          in: path
+          required: true
+          description: The ID of the page to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse'
+        '400':
+          description: Bad request, invalid page ID.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to retrieve the page.
+        '404':
+          description: Page not found.
         '500':
           description: Internal server error.
       security:
