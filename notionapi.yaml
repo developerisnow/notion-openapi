@@ -1,0 +1,120 @@
+openapi: 3.1.0
+info:
+  title: Notion API
+  version: 1.0.0
+  description: API documentation for Notion's `POST /v1/pages` endpoint.
+
+servers:
+  - url: https://api.notion.com
+    description: Notion API Server
+
+paths:
+  /v1/pages:
+    post:
+      summary: Create a new page in a Notion database.
+      operationId: createPage
+      tags:
+        - Pages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePageRequest'
+      responses:
+        '200':
+          description: Successfully created a new page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse'
+        '400':
+          description: Bad request, invalid input parameters.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to create a page.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreatePageRequest:
+      type: object
+      properties:
+        parent:
+          type: object
+          properties:
+            database_id:
+              type: string
+              description: The ID of the database where the page should be created.
+          required:
+            - database_id
+        properties:
+          type: object
+          description: The properties of the page.
+          additionalProperties:
+            type: object
+            properties:
+              title:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    text:
+                      type: object
+                      properties:
+                        content:
+                          type: string
+                        link:
+                          type: object
+                          nullable: true
+                          properties:
+                            url:
+                              type: string
+                  required:
+                    - text
+        children:
+          type: array
+          description: List of block objects for the page content.
+          items:
+            type: object
+      required:
+        - parent
+        - properties
+
+    PageResponse:
+      type: object
+      properties:
+        object:
+          type: string
+        id:
+          type: string
+          description: The unique identifier for the page.
+        created_time:
+          type: string
+          format: date-time
+        last_edited_time:
+          type: string
+          format: date-time
+        parent:
+          type: object
+          properties:
+            type:
+              type: string
+            database_id:
+              type: string
+              description: The ID of the parent database.
+        properties:
+          type: object
+        url:
+          type: string
+          description: URL to the created page.
