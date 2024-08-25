@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Notion API
   version: 1.0.0
-  description: API documentation for Notion's `POST /v1/pages` and `GET /v1/pages/{page_id}` endpoints.
+  description: API documentation for Notion's `POST /v1/pages`, `GET /v1/pages/{page_id}`, and `GET /v1/pages/{page_id}/properties/{property_id}` endpoints.
 
 servers:
   - url: https://api.notion.com
@@ -67,6 +67,45 @@ paths:
           description: Forbidden, insufficient permissions to retrieve the page.
         '404':
           description: Page not found.
+        '500':
+          description: Internal server error.
+      security:
+        - bearerAuth: []
+
+  /v1/pages/{page_id}/properties/{property_id}:
+    get:
+      summary: Retrieve a page property using the page ID and property ID.
+      operationId: retrievePageProperty
+      tags:
+        - Page Properties
+      parameters:
+        - name: page_id
+          in: path
+          required: true
+          description: The ID of the page.
+          schema:
+            type: string
+        - name: property_id
+          in: path
+          required: true
+          description: The ID of the property to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the page property.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePropertyResponse'
+        '400':
+          description: Bad request, invalid page or property ID.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to retrieve the page property.
+        '404':
+          description: Page or property not found.
         '500':
           description: Internal server error.
       security:
@@ -151,3 +190,21 @@ components:
         url:
           type: string
           description: URL to the created page.
+
+    PagePropertyResponse:
+      type: object
+      properties:
+        object:
+          type: string
+        id:
+          type: string
+          description: The unique identifier for the property.
+        type:
+          type: string
+        property:
+          type: object
+        next_cursor:
+          type: string
+          nullable: true
+        has_more:
+          type: boolean
