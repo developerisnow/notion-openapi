@@ -1,0 +1,90 @@
+openapi: 3.1.0
+info:
+  title: Notion API
+  version: 1.0.0
+  description: API for searching content in Notion.
+
+servers:
+  - url: https://api.notion.com/v1
+
+paths:
+  /search:
+    post:
+      summary: Search content in Notion
+      operationId: searchRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successful search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+      parameters:
+        - name: Notion-Version
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "2022-06-28"
+
+components:
+  schemas:
+    SearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: The search query.
+        sort:
+          type: object
+          properties:
+            direction:
+              type: string
+              enum: [ascending, descending]
+              description: Sort direction.
+            timestamp:
+              type: string
+              enum: [last_edited_time]
+              description: The timestamp to sort by.
+        filter:
+          type: object
+          properties:
+            value:
+              type: string
+              enum: [page, database]
+              description: Filter by object type.
+            property:
+              type: string
+              enum: [object]
+              description: The property to filter by.
+      required: [query]
+      description: The request body for searching content in Notion.
+
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            description: An individual search result.
+        next_cursor:
+          type: string
+          nullable: true
+          description: The cursor to use for the next set of results.
+        has_more:
+          type: boolean
+          description: Indicates if more results are available.
+        type:
+          type: string
+          description: The type of the search result object.
+        page_or_database:
+          type: object
+          description: Detailed information if the result is a page or database.
+      required: [results, has_more]
