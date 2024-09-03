@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: Notion API
+  version: 1.0.0
+  description: API for managing pages in Notion.
+
+servers:
+  - url: https://api.notion.com/v1
+
+paths:
+  /pages:
+    post:
+      summary: Create a new page
+      operationId: createPage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePageRequest'
+      responses:
+        '200':
+          description: Successful page creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse'
+      parameters:
+        - name: Notion-Version
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "2022-06-28"
+
+components:
+  schemas:
+    CreatePageRequest:
+      type: object
+      properties:
+        parent:
+          type: object
+          properties:
+            database_id:
+              type: string
+              description: The ID of the database where the page should be created.
+            page_id:
+              type: string
+              description: The ID of the parent page where the new page should be created as a child.
+          oneOf:
+            - required: [database_id]
+            - required: [page_id]
+        properties:
+          type: object
+          properties:
+            title:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [text]
+                  text:
+                    type: object
+                    properties:
+                      content:
+                        type: string
+                        example: "Grocery list"
+                    required: [content]
+                required: [type, text]
+          required: [title]
+          description: The properties of the page, including a "title" field, which is an array of text objects.
+      required: [parent, properties]
+
+    PageResponse:
+      type: object
+      properties:
+        object:
+          type: string
+          example: "page"
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the page.
+        created_time:
+          type: string
+          format: date-time
+          description: The time when the page was created.
+        last_edited_time:
+          type: string
+          format: date-time
+          description: The time when the page was last edited.
+        parent:
+          type: object
+          description: Information about the parent of the page.
+        properties:
+          type: object
+          description: The properties of the page.
+      required: [object, id, created_time, last_edited_time, parent, properties]
