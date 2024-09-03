@@ -8,17 +8,53 @@ components:
             type: object
           type: array
         parent:
+          description: Specifies the parent of the new page, either a database or
+            another page.
+          oneOf:
+          - required:
+            - database_id
+          - required:
+            - page_id
           properties:
             database_id:
               description: The ID of the database where the page should be created.
               type: string
-          required:
-          - database_id
+            page_id:
+              description: The ID of the parent page where the new page should be
+                created as a child.
+              type: string
           type: object
         properties:
-          additionalProperties:
-            type: object
-          description: The properties of the page.
+          description: The properties of the page, including a "title" field, which
+            is an array of text objects.
+          properties:
+            title:
+              description: An array of text objects that form the title of the page.
+              items:
+                description: An object representing a text fragment of the title.
+                properties:
+                  text:
+                    description: The text object containing the content of the title.
+                    properties:
+                      content:
+                        description: The content of the title.
+                        example: Grocery list
+                        type: string
+                    required:
+                    - content
+                    type: object
+                  type:
+                    description: The type of the text object, which should be "text".
+                    enum:
+                    - text
+                    type: string
+                required:
+                - type
+                - text
+                type: object
+              type: array
+          required:
+          - title
           type: object
       required:
       - parent
