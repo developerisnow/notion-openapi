@@ -9,10 +9,6 @@ paths:
   /search:
     post:
       summary: Search content in Notion
-paths:
-  /search:
-    post:
-      summary: Search content in Notion
       description: |
         Optimized for specific text queries and object types (page, database). Use smaller `page_size` for speed. Prioritizes directly shared items. Not for exhaustive listings or detailed database searches. Indexing delay may affect results; add a Refresh button to retry searches.
       operationId: searchRequest
