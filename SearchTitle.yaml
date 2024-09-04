@@ -3,10 +3,8 @@ info:
   title: Notion API
   version: 1.0.0
   description: API for searching content in Notion.
-
 servers:
   - url: https://api.notion.com/v1
-
 paths:
   /search:
     post:
@@ -17,22 +15,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchRequest'
+              $ref: "#/components/schemas/SearchRequest"
       responses:
-        '200':
+        "200":
           description: Successful search results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponse'
+                $ref: "#/components/schemas/SearchResponse"
       parameters:
         - name: Notion-Version
           in: header
           required: true
           schema:
             type: string
-            example: "2022-06-28"
-
+            example: 2022-06-28
 components:
   schemas:
     SearchRequest:
@@ -44,28 +41,40 @@ components:
         sort:
           type: object
           properties:
-            direction:
-              type: string
-              enum: [ascending, descending]
-              description: Sort direction.
             timestamp:
               type: string
-              enum: [last_edited_time]
-              description: The timestamp to sort by.
+              enum:
+                - last_edited_time
+              description: The timestamp criteria for sorting results.
+            direction:
+              type: string
+              enum:
+                - ascending
+                - descending
+              description: The direction of sorting.
         filter:
           type: object
           properties:
             value:
               type: string
-              enum: [page, database]
-              description: Filter by object type.
+              enum:
+                - page
+                - database
+              description: Filters results by object type.
             property:
               type: string
-              enum: [object]
-              description: The property to filter by.
-      required: [query]
-      description: The request body for searching content in Notion.
-
+              enum:
+                - object
+              description: Filters by the object type property.
+        start_cursor:
+          type: string
+          description: Cursor for paginating results.
+        page_size:
+          type: integer
+          format: int32
+          default: 100
+          maximum: 100
+          description: Number of items to include in response, max 100.
     SearchResponse:
       type: object
       properties:
@@ -87,4 +96,6 @@ components:
         page_or_database:
           type: object
           description: Detailed information if the result is a page or database.
-      required: [results, has_more]
+      required:
+        - results
+        - has_more
