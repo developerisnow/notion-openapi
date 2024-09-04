@@ -76,11 +76,9 @@ openapi: 3.1.0
 paths:
   /v1/blocks/{block_id}:
     get:
-      description: '
-
-
-        Note: The top-level block for each page is the page itself, therefore a page
-        ID can be used as a valid block ID.'
+      description: Retrieves a Block object using the specified ID. If `has_children`
+        is true, use the Retrieve block children endpoint. For page content, set the
+        page ID as block_id. Requires read content capabilities; returns 403 if unauthorized.
       operationId: retrieveBlock
       parameters:
       - description: The ID of the block to retrieve.
