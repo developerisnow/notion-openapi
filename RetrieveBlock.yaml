@@ -1,0 +1,123 @@
+components:
+  schemas:
+    BlockChildrenResponse:
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          nullable: true
+          type: string
+        object:
+          type: string
+        results:
+          items:
+            type: object
+          type: array
+      type: object
+    BlockResponse:
+      properties:
+        archived:
+          description: Indicates if the block is archived.
+          type: boolean
+        created_time:
+          format: date-time
+          type: string
+        has_children:
+          description: Indicates if the block has children.
+          type: boolean
+        id:
+          description: The unique identifier for the block.
+          type: string
+        last_edited_time:
+          format: date-time
+          type: string
+        object:
+          type: string
+        properties:
+          description: The block's properties based on its type.
+          type: object
+        type:
+          description: The type of the block (e.g., paragraph, image).
+          type: string
+      type: object
+    UpdateBlockChildrenRequest:
+      properties:
+        children:
+          description: The list of block children to update.
+          items:
+            type: object
+          type: array
+      required:
+      - children
+      type: object
+    UpdateBlockRequest:
+      properties:
+        properties:
+          description: The properties to update for the block.
+          type: object
+        type:
+          description: The type of block (e.g., paragraph, image).
+          type: string
+      required:
+      - type
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+info:
+  description: API documentation for Notion's `PATCH /v1/blocks/{block_id}/children`,
+    `GET /v1/blocks/{block_id}`, `GET /v1/blocks/{block_id}/children`, `PATCH /v1/blocks/{block_id}`,
+    and `DELETE /v1/blocks/{block_id}` endpoints.
+  title: Notion API
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /v1/blocks/{block_id}:
+    get:
+      description: '
+
+
+        Note: The top-level block for each page is the page itself, therefore a page
+        ID can be used as a valid block ID.'
+      operationId: retrieveBlock
+      parameters:
+      - description: The ID of the block to retrieve.
+        in: path
+        name: block_id
+        required: true
+        schema:
+          type: string
+      - description: Specifies the version of the Notion API to use.
+        in: header
+        name: Notion-Version
+        required: true
+        schema:
+          example: '2022-06-28'
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockResponse'
+          description: Successfully retrieved the block.
+        '400':
+          description: Bad request, invalid block ID.
+        '401':
+          description: Unauthorized, missing or invalid authentication token.
+        '403':
+          description: Forbidden, insufficient permissions to retrieve the block.
+        '404':
+          description: Block not found.
+        '500':
+          description: Internal server error.
+      security:
+      - bearerAuth: []
+      summary: Retrieve a block object using its ID.
+      tags:
+      - Blocks
+servers:
+- description: Notion API Server
+  url: https://api.notion.com
