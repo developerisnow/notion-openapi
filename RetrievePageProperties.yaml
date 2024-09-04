@@ -1,0 +1,124 @@
+openapi: 3.1.0
+info:
+  description: API documentation for Notion's page management endpoints.
+  title: Notion API
+  version: 1.0.0
+servers:
+- description: Notion API Server
+  url: https://api.notion.com
+paths:
+  /v1/pages/{page_id}/properties/{property_id}:
+    get:
+      description: Retrieves a property_item object for a given page_id and property_id.
+        Depending on the property type, the object returned will either be a value
+        or a paginated list of property item values. For more details, refer to the
+        Notion API documentation.
+      operationId: retrievePageProperty
+      parameters:
+      - description: Identifier for a Notion page
+        in: path
+        name: page_id
+        required: true
+        schema:
+          type: string
+      - description: Identifier for a page property
+        in: path
+        name: property_id
+        required: true
+        schema:
+          type: string
+      - description: Specifies the version of the Notion API to use.
+        in: header
+        name: Notion-Version
+        required: true
+        schema:
+          example: '2022-06-28'
+          type: string
+      - description: The max number of property item objects on a page for paginated
+          properties.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          default: 100
+          format: int32
+          type: integer
+      - description: For paginated properties, the start cursor for pagination.
+        in: query
+        name: start_cursor
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyItemResponse'
+          description: Successful response with property item(s).
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request or exceeds the request limits.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Page or property not found, or integration lacks access.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Too many requests.
+      security:
+      - readContent: []
+      summary: Retrieve a page property item.
+      tags:
+      - Page Properties
+components:
+  headers: {}
+  parameters: {}
+  requestBodies: {}
+  responses: {}
+  schemas:
+    ErrorResponse:
+      description: Error response schema.
+      properties:
+        message:
+          type: string
+        object:
+          example: error
+          type: string
+        status:
+          example: 400
+          type: integer
+      type: object
+    PagePropertyResponse:
+      properties:
+        has_more:
+          type: boolean
+        id:
+          description: The unique identifier for the property.
+          type: string
+        next_cursor:
+          nullable: true
+          type: string
+        object:
+          type: string
+        property:
+          type: object
+        type:
+          type: string
+      type: object
+    PropertyItemResponse:
+      description: Response object for property items.
+      properties:
+        object:
+          example: property_item
+          type: string
+      type: object
+  securitySchemes: {}
